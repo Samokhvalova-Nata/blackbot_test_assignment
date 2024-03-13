@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import './App.css';
+import './App.styled.jsx';
+import { Container, FieldWrap, Image, ImageText, ImageWrap, Input, InputWrap, Label, Result, ResultText, Switcher, SwitcherInput, SwitcherLabel, SwitcherText, Title, Wrapper } from './App.styled.jsx';
 
 
 const App: React.FC = () => {
@@ -7,36 +8,26 @@ const App: React.FC = () => {
   const [action, setAction] = useState<'sell' | 'buy'>('sell');
   const [currentEthPrice, setCurrentEthPrice] = useState<number | null>(null);
   const [usdtAmount, setUsdtAmount ] = useState<number | null>(null);
-  const [isEthAmountEntered, setIsEthAmountEntered] = useState<boolean>(false);
-  const [lastEthAmount, setLastEthAmount] = useState<number | null>(null);
-  
 
   useEffect(() => {
+    if(!ethAmount) return;
     const ws = new WebSocket('wss://stream.binance.com:9443/ws/ethusdt@trade');
-
+    // console.log('ws on');
     ws.onmessage = event => {
       const parsedData  = JSON.parse(event.data);
       const price = parseFloat(parsedData.p);
       setCurrentEthPrice(price);
   };
 
-  const handleClose = () => {
+  return () => {
     ws.close();
   };
 
-  return handleClose;
   }, [ethAmount]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newEthAmount = parseFloat(e.target.value);
     setEthAmount(newEthAmount);
-
-    // const { value } = e.target;
-    // if (value) {
-    //   setEthAmount(Number(value))
-    // } else {
-    //   alert("Enter ETH amount")
-    // }
   };
 
   const handleRadioInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +39,6 @@ const App: React.FC = () => {
   //     setAction('sell');
   // }
   };
-  
 
   useEffect(() => {
     if (!ethAmount || !currentEthPrice) return;
@@ -56,45 +46,61 @@ const App: React.FC = () => {
     if (action === 'buy') {
       setUsdtAmount(ethAmount * currentEthPrice);
     } else if (action === 'sell') {
-      setUsdtAmount(ethAmount / currentEthPrice);
+      setUsdtAmount( parseFloat((ethAmount / currentEthPrice).toFixed(5)));
     }
   }, [action, currentEthPrice, ethAmount]);
 
-  return (<>
-    <div>
-      <h1>Калькулятор купівлі/продажу ETH</h1>
+  return (
+  <Container>
+    <Title>ETH Buy/Sell Calculator</Title>
+    <Wrapper>
 
-      <div>
-        <label>ETH amount
-          <input onChange={handleInputChange} value={ethAmount} type='number'/>
-        </label>
-      </div>
+      <FieldWrap>
+        <Label htmlFor='input-amount'>Enter amount</Label>
+        <InputWrap>
+          <Input onChange={handleInputChange} value={ethAmount} id='input-amount' 
+          // type='number' min="0"
+          />
+        <ImageWrap>
+          <Image alt="Ethereum logo" loading="lazy" width="24" height="24" src="https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png"/>
+          <ImageText>ETH</ImageText>
+        </ImageWrap>
+        </InputWrap>
+      </FieldWrap>
 
-      <div>
-      <label>
-        <input type='radio' name='action' value='sell' checked
+      <Switcher>
+      <SwitcherLabel>
+        <SwitcherInput type='radio' name='action' value='sell'  checked={action === "sell"}
         onChange={handleRadioInputChange}/>
         <div>
-          <p>Sell</p>
+          <SwitcherText>Sell</SwitcherText>
         </div>
-      </label>
-      <label>
-        <input type='radio' name='action' value='buy'
+      </SwitcherLabel>
+
+      <SwitcherLabel>
+        <SwitcherInput type='radio' name='action' value='buy' checked={action === "buy"}
         onChange={handleRadioInputChange}/>
         <div>
-          <p>Buy</p>
+          <SwitcherText>Buy</SwitcherText>
         </div>
-      </label>
-      </div>
+      </SwitcherLabel>
+      </Switcher>
 
-    </div>
-    <div>
-      <p>{action === 'sell' ? 'You will receive:' : 'You have to pay' }</p>
-      <div>
+    </Wrapper>
+    <FieldWrap>
+      <ResultText>{action === 'sell' ? 'You will receive' : 'You have to pay' }</ResultText>
+      <InputWrap>
+      <Result>
         {usdtAmount}
-      </div>
-    </div>
-    </>
+      </Result>
+      <ImageWrap>
+          <Image alt="Ethereum logo" loading="lazy" width="24" height="24" src="https://s2.coinmarketcap.com/static/img/coins/64x64/825.png"/>
+          <ImageText>USDT</ImageText>
+          </ImageWrap>
+      </InputWrap>
+      
+    </FieldWrap>
+    </Container>
   );
 };
 
