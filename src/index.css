@@ -3,6 +3,7 @@
 
 :root {
   --background-color: #181A20;
+  --secondary-background-color: #2B3139;
   --accent-color: #F0B90B;
   --hover-color: #A37200;
 
@@ -85,4 +86,14 @@ a {
 
 body::-webkit-scrollbar {
   display: none;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield; 
 }
