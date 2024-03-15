@@ -40,9 +40,9 @@ const App: React.FC = () => {
     };
 
     if (action === 'buy') {
-      setUsdtAmount(parseFloat((ethAmount * currentEthPrice).toFixed(8)));
+      setUsdtAmount(parseFloat((ethAmount / currentEthPrice).toFixed(8)));
     } else if (action === 'sell') {
-      setUsdtAmount( parseFloat((ethAmount / currentEthPrice).toFixed(8)));
+      setUsdtAmount( parseFloat((ethAmount * currentEthPrice).toFixed(2)));
     }
   }, [action, currentEthPrice, ethAmount]);
 
